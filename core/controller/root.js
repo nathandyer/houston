@@ -17,7 +17,8 @@ import { Log } from '~/app'
 let route = new Router()
 
 route.get('/', async (ctx) => {
-  return ctx.render('index', { hideUser: true })
+  ctx.state.hideUser = true
+  return ctx.render('index')
 })
 
 route.get('/dashboard', IsRole('USER'), async (ctx, next) => {

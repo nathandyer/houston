@@ -1,7 +1,84 @@
 extends /layout/main
 
+block head
+  link(rel="stylesheet", type="text/css", media="all", href="/styles/error.css")
+
+mixin str(lvl, str)
+  span(class= lvl) #{lvl}: 
+  | #{str}
+  |  
+
+mixin line(type)
+  - var chance = _.random(1, 100)
+  case type
+    when 'load'
+      - var verbs = []
+      if chance > 98
+        - var levels = ['verbose', 'debug', 'info']
+        - var people = ['Fabian', 'Avi', 'Daniel', 'Cody', 'Cassidy', 'Blake']
+        - verbs.push(`Yelling at ${Helpers.Random(people)}`)
+        - verbs.push(`Talking with ${Helpers.Random(people)}`)
+      else if chance < 3
+        - var levels = ['warn']
+        - verbs.push('Destroying the world')
+        - verbs.push('Initializing robot takeover')
+        - verbs.push('Executing order 66')
+        - verbs.push('Saving the cheerleader')
+        - verbs.push('Firing lazers')
+      else
+        - var levels = ['silly', 'verbose', 'debug']
+        - verbs.push('Reviewing pull requests')
+        - verbs.push('Fixing errors')
+        - verbs.push('Throwing ammo bags')
+        - verbs.push('Raking in karma')
+        - verbs.push('Designing applications')
+        - verbs.push('Chatting about politics')
+        - verbs.push('Eating pizza')
+        - verbs.push('Developing applications')
+      +str(Helpers.Random(levels), Helpers.Random(verbs))
+    when 'running'
+      if chance > 99
+        - var animals = ['Monkey', 'Rabbit', 'Squirl', 'Narwhal', 'User']
+        - var verbs = ['trying to access', 'atempting to steal']
+        - var noun = ['the database', 'code', 'projects', 'information', 'government secrets']
+        +str('warn', Helpers.Random(animals, verbs, noun))
+      else
+        - var paths = []
+        - paths.push('GET /styles/houston.css')
+        - paths.push('GET /favicon.ico')
+        - paths.push('GET /styles/error.css')
+        - paths.push('GET /')
+        - paths.push('GET /dashboard')
+        - var str = `${Helpers.Random(paths)} - ${_.random(1, 400)}ms`
+        +str('verbose', str)
+
+mixin console(lines, type)
+  - var i = 0
+  while i <= lines
+    +line(type)
+    - i++
+
 block body
-  div
-    h1= message
-    if stack
-      pre= stack
+  div#terminal-holder
+    div#terminal
+      div.titlebar
+        span.title node houston.js
+      div.window-content
+        pre
+          +str('info', 'Loading Houston')
+          +console(_.random(0, 4), 'load')
+          +str('info', 'Connected to database')
+          +str('info', `Houston running in ${Config.env} configuration`)
+          +console(_.random(10, 30), 'running')
+          if Config.env === 'development' && stack
+            for line in stack.split('\n')
+              +str('error', line)
+          else if Config.env !== 'development'
+            +str('debug', 'Suppressing error stack from prying eyes')
+          +str('error', message)
+          span.blink &block;
+  script.
+    $('#terminal .window-content').scrollTop(9999)
+    $(window).on('resize', function() {
+      $('#terminal .window-content').scrollTop(9999)
+    })

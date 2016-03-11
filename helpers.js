@@ -81,3 +81,18 @@ export function FlattenObject (obj, test) {
 
   return _.flatten(data)
 }
+
+/**
+ * Random
+ * Picks a random string from array
+ *
+ * @param {Array} list - List of options to pick from
+ * @returns {String} - Random string from array, seperated by a space
+ */
+export function Random (...lists) {
+  let str = ''
+  for (let i in lists) {
+    str += `${lists[i][_.random(0, lists[i].length - 1)]} `
+  }
+  return str.slice(0, -1)
+}

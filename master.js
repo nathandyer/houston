@@ -46,24 +46,27 @@ App.use(async (ctx, next) => {
     ctx.app.emit('error', error, ctx)
 
     const htmlRespond = (ctx.accepts(['json', 'html']) === 'html')
-    ctx.status = error.status
+    ctx.status = error.status | 500
+    ctx.state.hideUser = true
 
     if (error.expose && htmlRespond) {
-      return ctx.render('error', { message: error.message })
+      return ctx.render('error', error)
     } else if (error.expose) {
-      return ctx.body = { errors: [{
+      ctx.body = { errors: [{
         status: error.status,
         title: error.title,
         detail: error.message
       }]}
+      return
     } else if (htmlRespond) {
-      return ctx.render('error', { message: 'Houston, we have a problem' })
+      return ctx.render('error', { message: 'Server issues' })
     } else {
-      return ctx.body = { errors: [{
+      ctx.body = { errors: [{
         status: error.status,
         title: 'Internal Server Error',
         detail: 'An internal server error occured while proccessing your request'
       }]}
+      return
     }
   }
 })
@@ -83,6 +86,7 @@ App.use(async (ctx, next) => {
   ctx.state.basedir = Path.normalize(`${__dirname}/views`)
   ctx.state.Config = Config
   ctx.state.Helpers = Helpers
+  ctx.state._ = require('lodash')
 
   ctx.state.title = 'Houston'
   await next()
@@ -111,15 +115,18 @@ Log.info(`Loaded ${Helpers.ArrayString('Controller', routes)}`)
 
 // 404 page
 App.use(ctx => {
+  ctx.status = 404
+  ctx.state.hideUser = true
+
   if (ctx.accepts(['json', 'html']) === 'html') {
-    return ctx.render('error', { message: 'It seems you stuck the landing. World not found.' })
+    return ctx.render('error', { message: 'User trying to access non-existant page' })
   } else {
-    ctx.status = 404
-    return ctx.body = { errors: [{
+    ctx.body = { errors: [{
       status: 404,
       title: 'Page Not Found',
       detail: 'The page you are looking found can not be found'
     }]}
+    return
   }
 })
 

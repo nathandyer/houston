@@ -1,7 +1,15 @@
-/* Copyright 2015 elementary LLC.
-*
-* This file is part of elementary.io
-*/
+/***************************************
+* Copyright 2016 elementary LLC.       *
+* This file is part of elementaryos.io *
+***************************************/
+
+/************
+* STRUCTURE *
+************/
+
+body {
+    min-height: 100vh;
+}
 
 /******
 * NAV *
